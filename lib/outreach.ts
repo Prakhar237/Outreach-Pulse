@@ -1,4 +1,4 @@
-export type Channel = "Email" | "LinkedIn" | "WhatsApp" | "Pipedrive";
+export type Channel = "Email" | "LinkedIn" | "WhatsApp" | "Pipedrive" | "Other";
 export type Lead = {
   id: string;
   name: string;

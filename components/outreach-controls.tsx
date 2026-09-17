@@ -1,5 +1,5 @@
 "use client";
-import { Mail, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle, CalendarDays } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -44,6 +44,8 @@ export function ChannelMark({ channel }: { channel: string }) {
         <b>in</b>
       ) : channel === "Pipedrive" ? (
         <b>p</b>
+      ) : channel === "Other" ? (
+        <CalendarDays size={16} />
       ) : (
         <MessageCircle size={16} />
       )}

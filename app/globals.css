@@ -1416,6 +1416,18 @@ a:focus-visible {
 }
 
 :root { color-scheme: light; }
+.stat-clickable { width: 100%; text-align: left; font: inherit; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.stat-clickable:hover { border-color: #17836b; box-shadow: 0 3px 12px #17836b16; }
+.stat-clickable:focus-visible { outline: 3px solid #17836b; outline-offset: 3px; }
+.stat-action { display: flex; align-items: center; gap: 5px; margin-top: 12px; font-size: 12px; color: #17654f; }
+.meeting-list { padding: 0 24px 28px; overflow-y: auto; }
+.meeting-card { border: 1px solid #e0e7df; border-radius: 12px; padding: 22px; margin-top: 16px; background: #fafcf9; }
+.meeting-card h2 { font-size: 23px; letter-spacing: -.5px; margin: 8px 0 20px; }
+.meeting-card dl { display: grid; gap: 18px; }
+.meeting-card dt { font-size: 12px; font-weight: 600; color: #69776e; margin-bottom: 5px; }
+.meeting-card dd { margin: 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; white-space: pre-wrap; }
+.meeting-card a { display: inline-flex; align-items: center; gap: 4px; color: #17654f; text-decoration: underline; text-underline-offset: 3px; }
+.meeting-recorded { font-size: 11px; color: #69776e; margin-top: 22px; }
 .linkedin-profile-link {
   display: inline-flex;
   align-items: center;

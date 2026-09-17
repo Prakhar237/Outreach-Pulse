@@ -37,7 +37,7 @@ export const activityInput = z.object({
   channel: z
     .string()
     .refine(
-      (s) => [...channels, "Pipedrive"].includes(s),
+      (s) => [...channels, "Pipedrive", "Other"].includes(s),
       "Choose a valid channel",
     ),
   kind: z.string().refine((s) => kinds.includes(s), "Choose a valid activity"),
@@ -66,7 +66,7 @@ export const importRow = z
     channel: z
       .string()
       .refine(
-        (s) => ["", ...channels, "Pipedrive"].includes(s),
+        (s) => ["", ...channels, "Pipedrive", "Other"].includes(s),
         "Invalid channel",
       )
       .default(""),

@@ -71,6 +71,7 @@ import {
 } from "@/components/outreach-controls";
 import { OutreachForm } from "@/components/outreach-forms";
 import { Connections } from "@/components/outreach-connections";
+import { MeetingsSheet } from "@/components/meetings-sheet";
 const nav = [
   ["Overview", LayoutDashboard],
   ["Leads", Users],
@@ -158,6 +159,7 @@ export default function Dashboard() {
   const [now, setNow] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
+  const [meetingsOpen, setMeetingsOpen] = useState(false);
   const refresh = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -671,16 +673,23 @@ export default function Dashboard() {
                       sub: "Recorded booking activities",
                       icon: CalendarDays,
                     },
-                  ].map(({ title, value, sub, icon: Icon }) => (
-                    <div className="stat" key={title}>
+                  ].map(({ title, value, sub, icon: Icon }) => {
+                    const contents = <>
                       <div>
                         <span>{title}</span>
                         <Icon size={18} />
                       </div>
                       <strong>{value}</strong>
                       <small>{sub}</small>
-                    </div>
-                  ))}
+                    </>;
+                    return title === "Meetings booked" ? (
+                      <button type="button" className="stat stat-clickable" key={title}
+                        aria-haspopup="dialog" onClick={() => setMeetingsOpen(true)}
+                        aria-label={`View ${value} booked meetings`}>
+                        {contents}<span className="stat-action">View meeting details <ArrowUpRight size={14} /></span>
+                      </button>
+                    ) : <div className="stat" key={title}>{contents}</div>;
+                  })}
                 </div>
               )}
               {view === "Overview" && (
@@ -1124,6 +1133,8 @@ export default function Dashboard() {
           </footer>
         </div>
       </main>
+      <MeetingsSheet open={meetingsOpen} onOpenChange={setMeetingsOpen}
+        meetings={m.events.filter((event) => event.kind === "Meeting booked")} leads={data.leads} />
       <Sheet
         open={!!selectedLead}
         onOpenChange={(open) => {

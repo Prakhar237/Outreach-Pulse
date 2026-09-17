@@ -13,7 +13,7 @@ create table public.outreach_leads (
 );
 create table public.outreach_activities (
  id uuid primary key default gen_random_uuid(),lead_id uuid not null references public.outreach_leads(id) on delete cascade,
- channel text not null check(channel in ('Email','LinkedIn','WhatsApp','Pipedrive')),
+ channel text not null check(channel in ('Email','LinkedIn','WhatsApp','Pipedrive','Other')),
  kind text not null check(kind in ('Message sent','Reply received','Positive reply','Connection requested','Connection accepted','Meeting booked','Note')),
  message text not null,occurred_at timestamptz not null default now(),external_id text unique
 );
