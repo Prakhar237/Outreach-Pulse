@@ -11,6 +11,25 @@ function websiteLink(value: string) {
   } catch { return undefined; }
 }
 
+export function MeetingBrief({ lead, message }: { lead: Lead; message: string }) {
+  const raw = lead.source_data?.meeting_brief;
+  const brief = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+  const website = field(brief.website);
+  const href = website ? websiteLink(website) : undefined;
+  if (![website, field(brief.overview), field(brief.selling_pitch), field(brief.fallback_offer)].some(Boolean)) {
+    return <p>{message.replace(/\\n/g, "\n") || "No notes added yet."}</p>;
+  }
+  return <dl className="meeting-brief">
+    {website && <div><dt>Website</dt><dd>{href ? <a href={href} target="_blank" rel="noopener noreferrer">
+      {lead.company || new URL(href).hostname} <ArrowUpRight size={14} aria-hidden="true" />
+      <span className="meeting-domain">{new URL(href).hostname}</span>
+    </a> : website}</dd></div>}
+    {field(brief.overview) && <div><dt>Client overview</dt><dd>{field(brief.overview)}</dd></div>}
+    {field(brief.selling_pitch) && <div><dt>Selling pitch · Initial offer</dt><dd>{field(brief.selling_pitch)}</dd></div>}
+    {field(brief.fallback_offer) && <div><dt>Fallback offer</dt><dd>{field(brief.fallback_offer)}</dd></div>}
+  </dl>;
+}
+
 export function MeetingsSheet({ open, onOpenChange, meetings, leads }: {
   open: boolean; onOpenChange: (open: boolean) => void; meetings: Activity[]; leads: Lead[];
 }) {
@@ -24,22 +43,14 @@ export function MeetingsSheet({ open, onOpenChange, meetings, leads }: {
         {!meetings.length && <p className="empty-timeline">No meetings booked in this selection.</p>}
         {[...meetings].sort((a, b) => b.occurred_at.localeCompare(a.occurred_at)).map((meeting, index) => {
           const lead = leads.find((item) => item.id === meeting.lead_id);
-          const raw = lead?.source_data?.meeting_brief;
-          const brief = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
-          const website = field(brief.website);
-          const href = website ? websiteLink(website) : undefined;
           return <article className="meeting-card" key={meeting.id}>
             <p className="eyebrow">MEETING {index + 1}</p>
             <h2>{lead?.name || "Client details unavailable"}</h2>
             <dl>
               <div><dt>Client name</dt><dd>{lead?.name || "—"}</dd></div>
               <div><dt>Company</dt><dd>{lead?.company || "—"}</dd></div>
-              {website && <div><dt>Website</dt><dd>{href ? <a href={href} target="_blank" rel="noopener noreferrer">{website.replace(/^https?:\/\//i, "").replace(/\/$/, "")} <ArrowUpRight size={14} aria-hidden="true" /></a> : website}</dd></div>}
-              {field(brief.overview) && <div><dt>Basic overview</dt><dd>{field(brief.overview)}</dd></div>}
-              {field(brief.selling_pitch) && <div><dt>Selling pitch</dt><dd>{field(brief.selling_pitch)}</dd></div>}
-              {field(brief.fallback_offer) && <div><dt>Fallback offer</dt><dd>{field(brief.fallback_offer)}</dd></div>}
-              {!field(brief.overview) && <div><dt>Meeting notes</dt><dd>{meeting.message || "No notes added yet."}</dd></div>}
             </dl>
+            {lead && <MeetingBrief lead={lead} message={meeting.message} />}
             <p className="meeting-recorded">Booking logged {new Date(meeting.occurred_at).toLocaleDateString()} · {meeting.channel}</p>
           </article>;
         })}

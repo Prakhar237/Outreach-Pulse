@@ -38,7 +38,7 @@ test("CSV exports neutralize spreadsheet formulas and preserve quoted message te
   assert.equal(r.name, '\'=HYPERLINK("bad")');
   assert.equal(r.message, "a,\nb");
 });
-test("KPIs count distinct contacted leads and cap reply rate at 100%, with channel and time filters", () => {
+test("KPIs count distinct contacted leads and all recorded replies, with channel and time filters", () => {
   const now = Date.parse("2026-09-12T10:00:00Z");
   const a = (id, lead_id, kind, channel = "Email", age = 1) => ({
     id,
@@ -65,7 +65,7 @@ test("KPIs count distinct contacted leads and cap reply rate at 100%, with chann
   const all = metrics(data, "All channels", 30, now);
   assert.equal(all.contacted, 2);
   assert.equal(all.sent.length, 3);
-  assert.equal(all.replyRate, 50);
+  assert.equal(all.replyRate, 100);
   assert.equal(metrics(data, "Email", 30, now).replyRate, 100);
   assert.equal(
     metrics({ leads: [], activities: [], deals: [] }, "All channels", 30, now)

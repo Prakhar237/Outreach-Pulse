@@ -173,16 +173,18 @@ export function metrics(
     ["Reply received", "Positive reply"].includes(a.kind),
   );
   const contacted = new Set(sent.map((a) => a.lead_id));
-  const replied = new Set(
-    replies.filter((a) => contacted.has(a.lead_id)).map((a) => a.lead_id),
-  );
+  // Count every recorded reply in the selected period. A reply can be logged
+  // before its original outreach is matched to the same lead (for example,
+  // when the sender uses a different address), so requiring a matching sent
+  // activity would undercount the workspace's actual replies.
+  const replied = new Set(replies.map((a) => a.lead_id));
   return {
     events,
     sent,
     replies,
     contacted: contacted.size,
     replyRate: contacted.size
-      ? Math.round((replied.size / contacted.size) * 100)
+      ? Math.min(100, Math.round((replied.size / contacted.size) * 100))
       : 0,
     meetings: events.filter((a) => a.kind === "Meeting booked").length,
   };

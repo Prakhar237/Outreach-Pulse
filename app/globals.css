@@ -1428,6 +1428,16 @@ a:focus-visible {
 .meeting-card dd { margin: 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; white-space: pre-wrap; }
 .meeting-card a { display: inline-flex; align-items: center; gap: 4px; color: #17654f; text-decoration: underline; text-underline-offset: 3px; }
 .meeting-recorded { font-size: 11px; color: #69776e; margin-top: 22px; }
+.meeting-brief { display: grid; gap: 0; margin-top: 16px; border: 1px solid #e0e7df; border-radius: 10px; background: #f8faf7; overflow: hidden; }
+.meeting-brief > div { padding: 16px 18px; }
+.meeting-brief > div + div { border-top: 1px solid #e0e7df; }
+.meeting-brief dt { color: #66796d; font-size: 12px; font-weight: 600; margin-bottom: 7px; }
+.meeting-brief dd { margin: 0; font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; white-space: pre-wrap; }
+.meeting-brief a { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: #17654f; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.meeting-domain { flex-basis: 100%; color: #69776e; font-weight: 400; font-size: 12px; }
+.timeline-item { scroll-margin-top: 22px; }
+.timeline-item:focus { outline: none; }
+.timeline-item:focus-visible { outline: 2px solid #17836b; outline-offset: 5px; border-radius: 6px; }
 .linkedin-profile-link {
   display: inline-flex;
   align-items: center;

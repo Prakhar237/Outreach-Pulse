@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity as ActivityIcon,
   ArrowUpRight,
@@ -71,7 +71,7 @@ import {
 } from "@/components/outreach-controls";
 import { OutreachForm } from "@/components/outreach-forms";
 import { Connections } from "@/components/outreach-connections";
-import { MeetingsSheet } from "@/components/meetings-sheet";
+import { MeetingsSheet, MeetingBrief } from "@/components/meetings-sheet";
 const nav = [
   ["Overview", LayoutDashboard],
   ["Leads", Users],
@@ -160,6 +160,8 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
   const [meetingsOpen, setMeetingsOpen] = useState(false);
+  const latestConversation = useRef<HTMLElement>(null);
+  const scrollToConversation = useRef(false);
   const refresh = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -684,9 +686,17 @@ export default function Dashboard() {
                     </>;
                     return title === "Meetings booked" ? (
                       <button type="button" className="stat stat-clickable" key={title}
-                        aria-haspopup="dialog" onClick={() => setMeetingsOpen(true)}
+                        aria-haspopup="dialog" onClick={() => {
+                          const latest = [...m.events]
+                            .filter((event) => event.kind === "Meeting booked" && leadMap.has(event.lead_id))
+                            .sort((a, b) => b.occurred_at.localeCompare(a.occurred_at))[0];
+                          if (latest) {
+                            scrollToConversation.current = true;
+                            setSelected(latest.lead_id);
+                          } else setMeetingsOpen(true);
+                        }}
                         aria-label={`View ${value} booked meetings`}>
-                        {contents}<span className="stat-action">View meeting details <ArrowUpRight size={14} /></span>
+                        {contents}<span className="stat-action">Open latest conversation <ArrowUpRight size={14} /></span>
                       </button>
                     ) : <div className="stat" key={title}>{contents}</div>;
                   })}
@@ -1141,7 +1151,15 @@ export default function Dashboard() {
           if (!open) setSelected(null);
         }}
       >
-        <SheetContent className="lead-sheet">
+        <SheetContent className="lead-sheet" onOpenAutoFocus={(event) => {
+          if (!scrollToConversation.current) return;
+          event.preventDefault();
+          scrollToConversation.current = false;
+          requestAnimationFrame(() => {
+            latestConversation.current?.focus({ preventScroll: true });
+            latestConversation.current?.scrollIntoView({ block: "start", behavior: "auto" });
+          });
+        }}>
           {selectedLead && (
             <>
               <SheetHeader>
@@ -1224,11 +1242,12 @@ export default function Dashboard() {
                 </div>
                 <div className="timeline-heading">
                   <h2>One lead. Every touchpoint.</h2>
-                  <span>{timeline.length} activities</span>
+                  <span>{timeline.length} {timeline.length === 1 ? "activity" : "activities"}</span>
                 </div>
                 <div className="timeline">
-                  {timeline.map((a) => (
-                    <article key={a.id} className="timeline-item">
+                  {timeline.map((a, index) => (
+                    <article key={a.id} className="timeline-item" tabIndex={-1}
+                      ref={index === 0 ? latestConversation : undefined} aria-label={index === 0 ? `${a.kind} — latest conversation` : a.kind}>
                       <ChannelMark channel={a.channel} />
                       <div>
                         <div className="timeline-meta">
@@ -1241,7 +1260,9 @@ export default function Dashboard() {
                             Email preview · full message remains in your mailbox
                           </small>
                         )}
-                        <p>{a.message}</p>
+                        {a.kind === "Meeting booked" ? (
+                          <MeetingBrief lead={selectedLead} message={a.message} />
+                        ) : <p>{a.message.replace(/\\n/g, "\n")}</p>}
                       </div>
                     </article>
                   ))}
